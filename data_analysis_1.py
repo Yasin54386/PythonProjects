@@ -1,8 +1,16 @@
+import os
+import tensorflow as tf
+import warnings
+
+# Suppress TensorFlow and Keras warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+warnings.filterwarnings('ignore')
+
 # Import necessary libraries
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -108,27 +116,49 @@ for model, result in results.items():
     print("\n")
 
 # 5. Visualization of Metrics Comparison
+
+# Prepare the results for visualization
 labels = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+
+# Data for each model
 dt_scores = list(results['Decision Tree'].values())
 rf_scores = list(results['Random Forest'].values())
 nb_scores = list(results['Naive Bayes'].values())
 ann_scores = list(results['ANN'].values())
 
-x = np.arange(len(labels))  # Label locations
-width = 0.2  # Bar width
+# Define the position for the bars
+x = np.arange(len(labels))  # the label locations
+width = 0.2  # the width of the bars
 
+# Plotting the bar chart and saving the figure
 fig, ax = plt.subplots()
-rects1 = ax.bar(x - 1.5 * width, dt_scores, width, label='Decision Tree')
-rects2 = ax.bar(x - 0.5 * width, rf_scores, width, label='Random Forest')
-rects3 = ax.bar(x + 0.5 * width, nb_scores, width, label='Naive Bayes')
-rects4 = ax.bar(x + 1.5 * width, ann_scores, width, label='ANN')
+rects1 = ax.bar(x - 1.5*width, dt_scores, width, label='Decision Tree')
+rects2 = ax.bar(x - 0.5*width, rf_scores, width, label='Random Forest')
+rects3 = ax.bar(x + 0.5*width, nb_scores, width, label='Naive Bayes')
+rects4 = ax.bar(x + 1.5*width, ann_scores, width, label='ANN')
 
-# Add some text for labels, title, and custom x-axis tick labels
 ax.set_xlabel('Metrics')
-ax.set_title('Model Performance Comparison')
+ax.set_ylabel('Scores')
+ax.set_title('Comparison of Model Performance')
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
 
-fig.tight_layout()
-plt.show()
+# Save the plot as a PNG file
+plt.tight_layout()
+plt.savefig('model_performance_comparison.png')
+plt.close()
+
+# Plot individual bar charts for each metric
+metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+for i, metric in enumerate(metrics):
+    plt.figure(figsize=(6, 4))
+    plt.bar(['Decision Tree', 'Random Forest', 'Naive Bayes', 'ANN'],
+            [dt_scores[i], rf_scores[i], nb_scores[i], ann_scores[i]],
+            color=['blue', 'green', 'orange', 'red'])
+    plt.title(f'Comparison of {metric}')
+    plt.ylabel(f'{metric} Score')
+    plt.tight_layout()
+    # Save each individual plot
+    plt.savefig(f'{metric}_comparison.png')
+    plt.close()
